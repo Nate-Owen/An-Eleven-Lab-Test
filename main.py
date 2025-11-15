@@ -1,20 +1,35 @@
+from dotenv import load_dotenv
+load_dotenv()
+
+import os
 import requests
 
-API_KEY = "sk_128c8d2c71ea492be638d4696f2ae9682556ce12f4dee0ff"
+API_KEY = os.getenv("XI_API_KEY")
+print("Loaded key:", API_KEY)
+VOICE_ID = "EXAVITQu4vr4xnSDxMaL"
+TEXT = "Hello from ElevenLabs! This time the API should really speak."
 
-url = "https://api.elevenlabs.io/v1/text-to-speech/Support Agent"
+
+url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
 headers = {
-    "xi-api-key": API_KEY,
-    "Content-Type": "application/json"
+    "Accept": "audio/mpeg",
+    "Content-Type": "application/json",
+    "xi-api-key": API_KEY
 }
 data = {
-    "text": "Hello from ElevenLabs, this is your first GitHub test voice!",
-    "model_id": "agent_3501k9401jrpes08z8ah126tdtys"
+    "text": TEXT,
+    "model_id": "eleven_multilingual_v2"
 }
+
+print("API_KEY:", API_KEY)
+
+
 
 response = requests.post(url, headers=headers, json=data)
 
-with open("output.mp3", "wb") as f:
-    f.write(response.content)
-
-print("✅ Done! Check output.mp3 for your generated voice.")
+if response.ok:
+    with open("output.mp3", "wb") as f:
+        f.write(response.content)
+    print("✅ Voice created successfully, check output.mp3")
+else:
+    print("❌ Error:", response.status_code, response.text)
